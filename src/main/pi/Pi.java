@@ -1,5 +1,5 @@
-package main;
-import sensors.Encoder;
+package main.pi;
+import qed.Encoder;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;

@@ -1,8 +1,9 @@
-package sensors;
+package qed;
+
 
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 
-public class Encoder implements Runnable{
+public class Encoder implements Runnable, PIDSource{
 	
 	GpioPinDigitalInput pin1;
 	GpioPinDigitalInput pin2;
@@ -45,20 +46,29 @@ public class Encoder implements Runnable{
 	}
 
 	public void run() {
-		boolean prevStatePin1 = false, prevStatePin2 = false, beenFalse = true;
+		boolean statePin1, statePin2, prevStatePin1 = false, prevStatePin2 = false, beenFalse = true;
 		while(running){
+			statePin1 = pin1.isHigh();
+			statePin2 = pin2.isHigh();
 			if(beenFalse){
-				if(pin1.isHigh() && pin2.isHigh() && !(prevStatePin2)){
+				if(statePin1 && statePin2 && !(prevStatePin2)){
 					beenFalse = false;
 					count++;
 				}
-				else if(pin1.isHigh() && pin2.isHigh() && !(prevStatePin1)){
+				else if(statePin1 && statePin2 && !(prevStatePin1)){
 					beenFalse = false;
 					count--;
 				}
-			} else if (pin1.isLow() && pin2.isLow())
+			}
+			if (!statePin1 && !statePin2){
 				beenFalse = true;
+			}
+			prevStatePin1 = statePin1;
+			prevStatePin2 = statePin2;
 		}
 	}
 
+	public double getPIDInput() {
+		return get();
+	}
 }
